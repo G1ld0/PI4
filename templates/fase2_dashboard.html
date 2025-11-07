@@ -15,16 +15,58 @@
         enquanto o boxplot nos mostra a mediana (a linha central), 
         onde se concentram 50% dos alunos (a caixa) e os outliers.
     </p>
-    
+
     <div id="boxplot-mt"></div>
 </div>
 
 <script>
-  // Pega o JSON que o app.py enviou
-  var graph_data = {{ graphJSON_boxplot_mt|safe }};
+    // 4a. Pega os dados que o app.py enviou (usando o filtro |tojson)
+    // Isso é seguro e o editor não vai reclamar.
+    var dados_x = {{ dados_x|tojson }};
+    var dados_y = {{ dados_y|tojson }};
 
-  // Manda o Plotly desenhar o gráfico dentro do DIV 'boxplot-mt'
-  Plotly.newPlot('boxplot-mt', graph_data.data, graph_data.layout);
+    // 4b. Precisamos separar os dados em "Pública" e "Privada" para o Plotly
+    var notas_privada = [];
+    var notas_publica = [];
+
+    for (var i = 0; i < dados_x.length; i++) {
+        if (dados_x[i] === 'Privada') {
+            notas_privada.push(dados_y[i]);
+        } else if (dados_x[i] === 'Pública') {
+            notas_publica.push(dados_y[i]);
+        }
+    }
+
+    // 4c. Cria os "traços" (séries) do gráfico
+    var trace_privada = {
+        y: notas_privada,
+        type: 'box',
+        name: 'Privada',
+        marker: {color: '#3b82f6'}
+    };
+
+    var trace_publica = {
+        y: notas_publica,
+        type: 'box',
+        name: 'Pública',
+        marker: {color: '#c0c0c0'}
+    };
+
+    var data = [trace_privada, trace_publica];
+
+    // 4d. Define o layout (tema dark)
+    var layout = {
+        title: 'Distribuição das Notas de Matemática (SP)',
+        yaxis: {title: 'Nota de Matemática (0-1000)'},
+        template: 'plotly_dark',
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        font: {color: 'white'}
+    };
+
+    // 4e. Manda o Plotly desenhar o gráfico
+    Plotly.newPlot('boxplot-mt', data, layout);
+
 </script>
 
 {% endblock %}
