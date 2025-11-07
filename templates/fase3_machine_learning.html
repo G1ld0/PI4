@@ -3,13 +3,176 @@
 {% block title %}ML - Análise ENEM 2024{% endblock %}
 
 {% block content %}
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<style>
+    .filter-buttons a {
+        background-color: var(--cor-secundaria);
+        color: var(--cor-texto-sec);
+        border: 1px solid var(--cor-destaque);
+        padding: 10px 20px;
+        margin: 5px;
+        border-radius: 5px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    .filter-buttons a:hover {
+        background-color: var(--cor-destaque);
+        color: var(--cor-primaria);
+    }
+    .filter-buttons a.active {
+        background-color: var(--cor-destaque);
+        color: var(--cor-primaria);
+        font-weight: 700;
+        box-shadow: 0 0 10px var(--cor-destaque);
+    }
+    /* Estilo para o nosso card de Score */
+    .kpi-card {
+        background-color: var(--cor-secundaria);
+        border: 1px solid var(--cor-destaque);
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+    }
+    .kpi-title {
+        font-size: 1.2em;
+        font-weight: 300;
+        color: var(--cor-texto-sec);
+        margin: 0;
+    }
+    .kpi-value {
+        font-size: 3.5em;
+        font-weight: 700;
+        color: var(--cor-destaque);
+        margin: 10px 0;
+    }
+</style>
+
 <div class="card">
     <h1>Análise Preditiva (Aprendizado de Máquina)</h1>
-    <h2>(Em Construção)</h2>
     <p>
-        Nesta etapa, aplicaremos um modelo de Regressão (Random Forest) para
-        identificar quais fatores (Tipo de Escola, Localização) têm o maior
-        impacto na previsão das notas de desempenho no ENEM.
+        Para atender ao tema norteador da Univesp, aplicamos um modelo de 
+        Aprendizado de Máquina (um <em>Random Forest Regressor</em>) para 
+        tentar prever a nota de um aluno.
     </p>
 </div>
+
+<div class="card">
+    <h2>Filtro de Matéria</h2>
+    <p>Selecione uma matéria para treinar o modelo e ver os resultados:</p>
+    <div class="filter-buttons">
+        <a href="/aprendizado-maquina?materia=mt" 
+           class="{% if materia_ativa == 'mt' %}active{% endif %}">
+           Matemática
+        </a>
+        <a href="/aprendizado-maquina?materia=red" 
+           class="{% if materia_ativa == 'red' %}active{% endif %}">
+           Redação
+        </a>
+        <a href="/aprendizado-maquina?materia=lc" 
+           class="{% if materia_ativa == 'lc' %}active{% endif %}">
+           Linguagens
+        </a>
+        <a href="/aprendizado-maquina?materia=ch" 
+           class="{% if materia_ativa == 'ch' %}active{% endif %}">
+           Humanas
+        </a>
+        <a href="/aprendizado-maquina?materia=cn" 
+           class="{% if materia_ativa == 'cn' %}active{% endif %}">
+           Natureza
+        </a>
+    </div>
+</div>
+
+<div class="kpi-card">
+    <h3 class="kpi-title">
+        Score R² (Capacidade de Explicação) para {{ materia_ativa.upper() }}
+    </h3>
+    <div class="kpi-value">
+        {{ ml_score }}%
+    </div>
+    <p class="kpi-title">
+        Isto significa que nosso modelo, usando apenas os fatores 
+        "Tipo de Escola" e "Localização", consegue explicar 
+        <strong>{{ ml_score }}%</strong> da variação das notas.
+    </p>
+</div>
+
+
+<div class="card">
+    <h2>Importância das Variáveis</h2>
+    <p>Qual fator tem mais "peso" para definir a nota? (Soma total = 1.0)</p>
+    <div id="importance-chart"></div>
+</div>
+
+<div class="card">
+    <h2>Validação do Modelo: Nota Real vs. Nota Prevista</h2>
+    <p>
+        Este gráfico plota a nota real do aluno (Eixo Y) contra a nota que o
+        modelo "adivinhou" (Eixo X). Quanto mais os pontos formarem uma 
+        linha reta, melhor o modelo.
+    </p>
+    <div id="scatter-chart"></div>
+</div>
+
+<script>
+    // 1. Pega TODOS os dados que o app.py enviou
+    var data_importance = {{ ml_data_importance|tojson }};
+    var data_scatter = {{ ml_data_scatter|tojson }};
+
+    // ----------------------------------------------------
+    // 2. DESENHA O GRÁFICO 1: IMPORTÂNCIA (Gráfico de Barras)
+    // ----------------------------------------------------
+    var trace_importance = {
+        x: data_importance.importance,
+        y: data_importance.features,
+        type: 'bar',
+        orientation: 'h',
+        marker: { color: '#3b82f6' }
+    };
+    var layout_importance = {
+        template: 'plotly_dark',
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        font: {color: 'white'},
+        title: data_importance.titulo,
+        xaxis: {title: 'Nível de Importância (Soma total = 1.0)'},
+        yaxis: {
+            title: 'Fator de Análise',
+            categoryorder: 'total ascending' 
+        },
+        margin: { l: 250 } // A margem que corrigimos
+    };
+    Plotly.newPlot('importance-chart', [trace_importance], layout_importance);
+
+    // ----------------------------------------------------
+    // 3. DESENHA O GRÁFICO 2: DISPERSÃO (Scatter Plot)
+    // ----------------------------------------------------
+    var trace_scatter = {
+        x: data_scatter.previsto,
+        y: data_scatter.real,
+        mode: 'markers', // Define como gráfico de pontos
+        type: 'scatter',
+        marker: { 
+            color: '#3b82f6',
+            opacity: 0.5 // Deixa os pontos semi-transparentes
+        }
+    };
+    var layout_scatter = {
+        template: 'plotly_dark',
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        font: {color: 'white'},
+        title: data_scatter.titulo,
+        xaxis: {title: 'Nota PREVISTA pelo Modelo'},
+        yaxis: {title: 'Nota REAL do Aluno'}
+    };
+    Plotly.newPlot('scatter-chart', [trace_scatter], layout_scatter);
+
+</script>
+
 {% endblock %}
