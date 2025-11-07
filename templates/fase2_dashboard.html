@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Análise ENEM 2024{% endblock %}
+
+{% block content %}
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<div class="card">
+    <h2>Comparativo de Desempenho: Matemática</h2>
+    <p>
+        Abaixo, usamos um gráfico Boxplot para comparar a distribuição completa das notas 
+        de Matemática entre os dois grupos. As tabelas de média (vistas na página 
+        de Análise Descritiva) podem esconder a realidade dos dados, 
+        enquanto o boxplot nos mostra a mediana (a linha central), 
+        onde se concentram 50% dos alunos (a caixa) e os outliers.
+    </p>
+    
+    <div id="boxplot-mt"></div>
+</div>
+
+<script>
+  // Pega o JSON que o app.py enviou
+  var graph_data = {{ graphJSON_boxplot_mt|safe }};
+
+  // Manda o Plotly desenhar o gráfico dentro do DIV 'boxplot-mt'
+  Plotly.newPlot('boxplot-mt', graph_data.data, graph_data.layout);
+</script>
+
+{% endblock %}

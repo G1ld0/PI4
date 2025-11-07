@@ -1,0 +1,146 @@
+/* --- 1. Configurações Gerais e Fontes Modernas --- */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+:root {
+  --cor-primaria: #0a0a23;   /* Um azul-marinho bem escuro */
+  --cor-secundaria: #1b1b32; /* Um azul-escuro mais suave */
+  --cor-borda: #1b1b32;
+  --cor-texto: #f5f6f7;      /* Texto principal (quase branco) */
+  --cor-texto-sec: #c0c0c0;   /* Texto secundário (cinza claro) */
+  --cor-destaque: #3b82f6;   /* Azul brilhante para links e destaques */
+}
+
+body {
+  font-family: 'Roboto', Arial, sans-serif;
+  background-color: var(--cor-primaria);
+  color: var(--cor-texto);
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 700;
+  color: var(--cor-texto);
+  text-align: center;
+}
+
+h1 { font-size: 2.5em; margin-bottom: 10px; }
+h2 { font-size: 1.8em; color: var(--cor-texto-sec); margin-top: 40px; }
+p { font-weight: 300; line-height: 1.6; }
+
+/* --- 2. Barra de Navegação (Menu) --- */
+.navbar {
+  background-color: var(--cor-secundaria);
+  padding: 1rem 2rem;
+  border-bottom: 2px solid var(--cor-borda);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+.navbar-brand {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: var(--cor-texto);
+  text-decoration: none;
+}
+.nav-links a {
+  color: var(--cor-texto-sec);
+  text-decoration: none;
+  font-weight: 400;
+  margin-left: 20px;
+  padding-bottom: 5px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+.nav-links a:hover, .nav-links a.active {
+  color: var(--cor-destaque);
+  border-bottom: 2px solid var(--cor-destaque);
+}
+
+/* --- 3. Layout Principal e Cards Responsivos --- */
+.container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+}
+.card {
+  background-color: var(--cor-secundaria);
+  border: 1px solid var(--cor-borda);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow-x: auto; /* Garante que tabelas rolem em telas pequenas */
+}
+
+/* --- 4. Estilo das Tabelas --- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+th, td {
+  border: 1px solid var(--cor-borda);
+  padding: 12px 15px;
+  text-align: left;
+}
+th {
+  background-color: var(--cor-primaria);
+  font-weight: 700;
+  color: var(--cor-destaque);
+}
+tr:nth-child(even) {
+  background-color: rgba(0,0,0,0.1); /* Linhas alternadas */
+}
+
+/* --- 5. Animação de Loading --- */
+.loader-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--cor-primaria);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+.loader {
+  border: 8px solid var(--cor-secundaria);
+  border-top: 8px solid var(--cor-destaque);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+/* Classe para esconder o loader com JS */
+.loader-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* --- 6. Design Responsivo (Media Queries) --- */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 1rem;
+  }
+  .nav-links {
+    margin-top: 15px;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+  }
+  .nav-links a {
+    margin-left: 0;
+  }
+  h1 { font-size: 2em; }
+  h2 { font-size: 1.5em; }
+}

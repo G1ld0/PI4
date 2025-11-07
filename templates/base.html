@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-B" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <title>{% block title %}Análise ENEM 2024 - SP{% endblock %}</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="loader-wrapper">
+        <div class="loader"></div>
+    </div>
+
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">Projeto Integrador - Análise ENEM</a>
+        <div class="nav-links">
+            <a href="/" 
+               class="{% if request.path == '/' %}active{% endif %}">
+               Dashboard Interativo
+            </a>
+            <a href="/analise-descritiva" 
+               class="{% if request.path == '/analise-descritiva' %}active{% endif %}">
+               Análise Descritiva (Tabelas)
+            </a>
+            <a href="/aprendizado-maquina" 
+               class="{% if request.path == '/aprendizado-maquina' %}active{% endif %}">
+               Aprendizado de Máquina (ML)
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

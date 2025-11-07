@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Tabelas - Análise ENEM 2024{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>Média de Notas por Tipo de Escola</h2>
+  <table>
+    <tr>
+      <th>Tipo de Escola</th>
+      <th>Ciências da Natureza</th>
+      <th>Ciências Humanas</th>
+      <th>Linguagens e Códigos</th>
+      <th>Matemática</th>
+      <th>Redação</th>
+    </tr>
+    {% for tipo, notas in media_por_tipo.items() %}
+    <tr>
+      <td>{{ tipo }}</td>
+      <td>{{ notas['NU_NOTA_CN'] }}</td>
+      <td>{{ notas['NU_NOTA_CH'] }}</td>
+      <td>{{ notas['NU_NOTA_LC'] }}</td>
+      <td>{{ notas['NU_NOTA_MT'] }}</td>
+      <td>{{ notas['NU_NOTA_REDACAO'] }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="card">
+  <h2>Média de Notas por Tipo e Localização da Escola</h2>
+  <table>
+    <tr>
+      <th>Tipo de Escola</th>
+      <th>Localização</th>
+      <th>Ciências da Natureza</th>
+      <th>Ciências Humanas</th>
+      <th>Linguagens e Códigos</th>
+      <th>Matemática</th>
+      <th>Redação</th>
+    </tr>
+    {% for key, notas in media_por_localizacao.items() %}
+    <tr>
+      <td>{{ key[0] }}</td>
+      <td>{{ key[1] }}</td>
+      <td>{{ notas['NU_NOTA_CN'] }}</td>
+      <td>{{ notas['NU_NOTA_CH'] }}</td>
+      <td>{{ notas['NU_NOTA_LC'] }}</td>
+      <td>{{ notas['NU_NOTA_MT'] }}</td>
+      <td>{{ notas['NU_NOTA_REDACAO'] }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="card">
+  <h2>Estatísticas por Tipo de Escola</h2>
+  <table>
+    <tr>
+      <th>Tipo de Escola</th>
+      <th>Número de Alunos</th>
+      <th>Porcentagem (%)</th>
+    </tr>
+    {% for tipo, count in contagem_por_tipo.items() %}
+    <tr>
+      <td>{{ tipo }}</td>
+      <td>{{ count }}</td>
+      <td>{{ porcentagem_por_tipo[tipo] }}%</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="card">
+  <h2>Estatísticas por Tipo e Localização da Escola</h2>
+  <table>
+    <tr>
+      <th>Tipo de Escola</th>
+      <th>Localização</th>
+      <th>Número de Alunos</th>
+      <th>Porcentagem (%)</th>
+    </tr>
+    {% for key, count in contagem_por_tipo_local.items() %}
+    <tr>
+      <td>{{ key[0] }}</td>
+      <td>{{ key[1] }}</td>
+      <td>{{ count }}</td>
+      <td>{{ porcentagem_por_tipo_local[key] }}%</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}
