@@ -6,17 +6,12 @@
 
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-<div class="card">
-    <h2>Filtros Dinâmicos</h2>
-    <p>Selecione uma localização para filtrar todos os gráficos do dashboard:</p>
-    <div class="filter-buttons">
-        <button class="filter-btn active" data-filter="Geral">Ver Geral</button>
-        <button class="filter-btn" data-filter="Urbana">Apenas Urbana</button>
-        <button class="filter-btn" data-filter="Rural">Apenas Rural</button>
-    </div>
-</div>
-
 <style>
+    .filter-buttons {
+        display: flex;
+        flex-wrap: wrap; 
+        justify-content: center;
+    }
     .filter-buttons button {
         background-color: var(--cor-secundaria);
         color: var(--cor-texto-sec);
@@ -28,77 +23,87 @@
         cursor: pointer;
         transition: all 0.3s ease;
     }
-    .filter-buttons button:hover {
-        background-color: var(--cor-destaque);
-        color: var(--cor-primaria);
-    }
+    .filter-buttons button:hover,
     .filter-buttons button.active {
         background-color: var(--cor-destaque);
         color: var(--cor-primaria);
         font-weight: 700;
         box-shadow: 0 0 10px var(--cor-destaque);
     }
+    .plotly-chart-div {
+        min-height: 450px;
+    }
 </style>
 
 <div class="card">
+    <h2>Filtros Dinâmicos</h2>
+    <p>Selecione uma localização para filtrar todos os gráficos do dashboard:</p>
+    <div class="filter-buttons">
+        <button class="filter-btn active" data-filter="Geral">Urbana e Rural</button>
+        <button class="filter-btn" data-filter="Urbana">Apenas Urbana</button>
+        <button class="filter-btn" data-filter="Rural">Apenas Rural</button>
+    </div>
+</div>
+
+<div class="card">
     <h2>Comparativo de Desempenho: Matemática</h2>
-    <div id="boxplot-mt"></div>
-    <div id="histogram-mt"></div>
+    <div id="boxplot-mt" class="plotly-chart-div"></div>
+    <div id="histogram-mt" class="plotly-chart-div"></div>
 </div>
 
 <div class="card">
     <h2>Comparativo de Desempenho: Redação</h2>
-    <div id="boxplot-red"></div>
-    <div id="histogram-red"></div>
+    <div id="boxplot-red" class="plotly-chart-div"></div>
+    <div id="histogram-red" class="plotly-chart-div"></div>
 </div>
 
 <div class="card">
     <h2>Comparativo de Desempenho: Linguagens e Códigos</h2>
-    <div id="boxplot-lc"></div>
-    <div id="histogram-lc"></div>
+    <div id="boxplot-lc" class="plotly-chart-div"></div>
+    <div id="histogram-lc" class="plotly-chart-div"></div>
 </div>
 
 <div class="card">
     <h2>Comparativo de Desempenho: Ciências Humanas</h2>
-    <div id="boxplot-ch"></div>
-    <div id="histogram-ch"></div>
+    <div id="boxplot-ch" class="plotly-chart-div"></div>
+    <div id="histogram-ch" class="plotly-chart-div"></div>
 </div>
 
 <div class="card">
     <h2>Comparativo de Desempenho: Ciências da Natureza</h2>
-    <div id="boxplot-cn"></div>
-    <div id="histogram-cn"></div>
+    <div id="boxplot-cn" class="plotly-chart-div"></div>
+    <div id="histogram-cn" class="plotly-chart-div"></div>
 </div>
 
 
 <script>
-    // 1. Pega TODOS os dados que o app.py enviou
+    // Pega todos os dados que o app.py enviou
     const dados_x = {{ dados_x|tojson }};
     const dados_y_por_materia = {{ dados_y_por_materia|tojson }};
     const dados_localizacao = {{ dados_localizacao|tojson }};
 
-    // 2. Define o layout base para o tema dark (NÃO MUDA)
+    // Define o layout base para o tema dark
     const layout_base = {
         template: 'plotly_dark',
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)',
-        font: {color: 'white'}
+        font: {color: 'white'},
+        responsive: true,
+        margin: { l: 50, r: 20, t: 50, b: 50 }
     };
-
-    // 3. --- A NOVA FUNÇÃO "MESTRA" ---
+    
+    // Função "Mestra" que redesenha tudo
     function atualizarGraficos(filtro) {
         console.log("Atualizando gráficos com filtro:", filtro);
 
-        // --- 3a. Filtra os dados ---
+        // Filtra os dados com base no botão clicado
         let dados_x_filtrados = [];
         let dados_y_filtrados = {
             mt: [], red: [], lc: [], ch: [], cn: []
         };
 
         for (let i = 0; i < dados_x.length; i++) {
-            // Se o filtro for 'Geral' OU a localização bater com o filtro...
             if (filtro === 'Geral' || dados_localizacao[i] === filtro) {
-                // Adiciona o dado desse aluno nas listas filtradas
                 dados_x_filtrados.push(dados_x[i]);
                 dados_y_filtrados.mt.push(dados_y_por_materia.mt[i]);
                 dados_y_filtrados.red.push(dados_y_por_materia.red[i]);
@@ -108,11 +113,10 @@
             }
         }
 
-        // --- 3b. Funções de criação de gráficos (agora usam os dados filtrados) ---
+        // Função interna para criar Boxplots
         function criarBoxplot(divId, titulo, dados_y_filtrados_materia) {
             let notas_privada = [];
             let notas_publica = [];
-
             for (let i = 0; i < dados_x_filtrados.length; i++) {
                 if (dados_x_filtrados[i] === 'Privada') {
                     notas_privada.push(dados_y_filtrados_materia[i]);
@@ -124,15 +128,18 @@
             let trace_privada = { y: notas_privada, type: 'box', name: 'Privada', marker: {color: '#3b82f6'} };
             let trace_publica = { y: notas_publica, type: 'box', name: 'Pública', marker: {color: '#c0c0c0'} };
             let data = [trace_privada, trace_publica];
-            let layout = { ...layout_base, title: titulo, yaxis: {title: 'Nota (0-1000)'} };
-            
-            Plotly.newPlot(divId, data, layout);
+            let layout = { 
+                ...layout_base, 
+                title: titulo, 
+                yaxis: {title: 'Nota (0-1000)', automargin: true } // automargin é bom aqui
+            };
+            Plotly.newPlot(divId, data, layout, {responsive: true});
         }
 
+        // Função interna para criar Histogramas
         function criarHistograma(divId, titulo, dados_y_filtrados_materia) {
             let notas_privada = [];
             let notas_publica = [];
-
             for (let i = 0; i < dados_x_filtrados.length; i++) {
                 if (dados_x_filtrados[i] === 'Privada') {
                     notas_privada.push(dados_y_filtrados_materia[i]);
@@ -144,12 +151,17 @@
             let trace_privada = { x: notas_privada, type: 'histogram', name: 'Privada', opacity: 0.75, marker: {color: '#3b82f6'} };
             let trace_publica = { x: notas_publica, type: 'histogram', name: 'Pública', opacity: 0.75, marker: {color: '#c0c0c0'} };
             let data = [trace_privada, trace_publica];
-            let layout = { ...layout_base, title: titulo, xaxis: {title: 'Faixa de Nota (0-1000)'}, yaxis: {title: 'Contagem de Alunos'}, barmode: 'overlay' };
-            
-            Plotly.newPlot(divId, data, layout);
+            let layout = { 
+                ...layout_base, 
+                title: titulo, 
+                xaxis: {title: 'Faixa de Nota (0-1000)'}, 
+                yaxis: {title: 'Contagem de Alunos'}, 
+                barmode: 'overlay' 
+            };
+            Plotly.newPlot(divId, data, layout, {responsive: true});
         }
 
-        // --- 3c. Chama as funções para recriar todos os 10 gráficos ---
+        // Chama as funções para recriar todos os 10 gráficos
         criarBoxplot('boxplot-mt', 'Boxplot - Matemática', dados_y_filtrados.mt);
         criarHistograma('histogram-mt', 'Histograma - Matemática', dados_y_filtrados.mt);
         criarBoxplot('boxplot-red', 'Boxplot - Redação', dados_y_filtrados.red);
@@ -162,31 +174,19 @@
         criarHistograma('histogram-cn', 'Histograma - Natureza', dados_y_filtrados.cn);
     }
     
-    // --- 4. Lógica de Ativação dos Botões ---
-    
-    // Pega todos os botões
+    // Lógica de Ativação dos Botões
     const botoesFiltro = document.querySelectorAll('.filter-btn');
-    
-    // Adiciona um "ouvinte" de clique em cada botão
     botoesFiltro.forEach(btn => {
         btn.addEventListener('click', () => {
-            // Remove a classe 'active' de todos os botões
             botoesFiltro.forEach(b => b.classList.remove('active'));
-            // Adiciona a classe 'active' apenas no botão clicado
             btn.classList.add('active');
-            
-            // Pega o valor do filtro (ex: 'Urbana')
             const filtro = btn.dataset.filter;
-            
-            // CHAMA A FUNÇÃO MESTRA PARA REDESENHAR TUDO
             atualizarGraficos(filtro);
         });
     });
 
-    // --- 5. Carga Inicial ---
-    // Desenha os gráficos pela primeira vez com o filtro 'Geral'
+    // Carga Inicial
     atualizarGraficos('Geral');
-
 </script>
 
 {% endblock %}

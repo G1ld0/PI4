@@ -1,6 +1,6 @@
-// Espera o evento "load" (página 100% carregada)
+// Espera o evento "load"
 window.addEventListener('load', () => {
   const loader = document.querySelector('.loader-wrapper');
-  // Adiciona a classe que faz o loader desaparecer
+  //classe que faz o loader desaparecer:
   loader.classList.add('loader-hidden');
 });

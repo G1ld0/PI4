@@ -1,10 +1,10 @@
-/* --- 1. Configurações Gerais e Fontes Modernas --- */
+/* --- 1. Configurações Gerais e Fontes --- */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
 
 :root {
   --cor-primaria: #0a0a23;   /* Um azul-marinho bem escuro */
   --cor-secundaria: #1b1b32; /* Um azul-escuro mais suave */
-  --cor-borda: #1b1b32;
+  --cor-borda: #3b82f6;      /* Borda azul (mudei de #1b1b32) */
   --cor-texto: #f5f6f7;      /* Texto principal (quase branco) */
   --cor-texto-sec: #c0c0c0;   /* Texto secundário (cinza claro) */
   --cor-destaque: #3b82f6;   /* Azul brilhante para links e destaques */
@@ -64,14 +64,16 @@ p { font-weight: 300; line-height: 1.6; }
   margin: 20px auto;
   padding: 20px;
 }
+
 .card {
   background-color: var(--cor-secundaria);
-  border: 1px solid var(--cor-borda);
+  border: 1px solid var(--cor-destaque); /* Borda azul (do kpi-card) */
   border-radius: 8px;
   padding: 24px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  overflow-x: auto; /* Garante que tabelas rolem em telas pequenas */
+  margin-bottom: 20px; /* Espaçamento padrão */
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); /* Sombra azul suave */
+  overflow-x: auto; 
+  text-align: center; /* Centraliza todo o texto */
 }
 
 /* --- 4. Estilo das Tabelas --- */
@@ -79,11 +81,11 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin: 20px 0;
+  text-align: left; 
 }
 th, td {
   border: 1px solid var(--cor-borda);
   padding: 12px 15px;
-  text-align: left;
 }
 th {
   background-color: var(--cor-primaria);
@@ -91,7 +93,7 @@ th {
   color: var(--cor-destaque);
 }
 tr:nth-child(even) {
-  background-color: rgba(0,0,0,0.1); /* Linhas alternadas */
+  background-color: rgba(0,0,0,0.1);
 }
 
 /* --- 5. Animação de Loading --- */
@@ -120,7 +122,6 @@ tr:nth-child(even) {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-/* Classe para esconder o loader com JS */
 .loader-hidden {
   opacity: 0;
   visibility: hidden;
@@ -143,4 +144,21 @@ tr:nth-child(even) {
   }
   h1 { font-size: 2em; }
   h2 { font-size: 1.5em; }
+}
+
+/* --- 7. Estilos de Cards Específicos --- */
+.kpi-card {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); 
+}
+.kpi-title {
+    font-size: 1.2em;
+    font-weight: 300;
+    color: var(--cor-texto-sec);
+    margin: 0;
+}
+.kpi-value {
+    font-size: 3.5em;
+    font-weight: 700;
+    color: var(--cor-destaque);
+    margin: 10px 0;
 }
